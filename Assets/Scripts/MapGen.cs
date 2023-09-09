@@ -7,6 +7,8 @@ using System;
 
 public class MapGen : MonoBehaviour
 {
+    
+
     public double width = 10;
     public double height = 10;
 
@@ -21,6 +23,7 @@ public class MapGen : MonoBehaviour
 
 
     public Tilemap tileMap;
+
     public TileBase[] water;
     public TileBase[] desert;
     public TileBase[] grass;
@@ -34,6 +37,7 @@ public class MapGen : MonoBehaviour
 
     private double e;
 
+    public List<TileData> tileDatas = new List<TileData>();
     
     public float moistureLvl;
     private double m;
@@ -104,44 +108,63 @@ public class MapGen : MonoBehaviour
         else if (E < 0.35)
         {
             tileMap.SetTile(new Vector3Int(x, y, 0), beach[0]);
+            TileData tileData = new TileData(new Vector3Int(x,y,0), 0, E);
+            tileDatas.Add(tileData);
+           
+            
         }
 
         else if (E < 0.4)
         {
-
             tileMap.SetTile(new Vector3Int(x, y, 0), grass[0]);
+            TileData tileData = new TileData(new Vector3Int(x, y, 0), 1, E);
+            tileDatas.Add(tileData);
         }
         else if (E < 0.5)
         {
             tileMap.SetTile(new Vector3Int(x, y, 0), forest[0]);
+            TileData tileData = new TileData(new Vector3Int(x, y, 0), 2, E);
+            tileDatas.Add(tileData);    
         }
         else if (E < 0.65)
         {
             if(m < 0.3)
             {
                 tileMap.SetTile(new Vector3Int(x, y, 0), desert[0]);
+                TileData tileData = new TileData(new Vector3Int(x, y, 0), 3, E);
+                tileDatas.Add(tileData);
             }
             else if (m < 0.5)
             {
                 tileMap.SetTile(new Vector3Int(x, y, 0), grass[0]);
+                TileData tileData = new TileData(new Vector3Int(x, y, 0), 1, E);
+                tileDatas.Add(tileData);
             }
             else if (m < 0.65)
             {
                 tileMap.SetTile(new Vector3Int(x, y, 0), forest[0]);
+                TileData tileData = new TileData(new Vector3Int(x, y, 0), 2, E);
+                tileDatas.Add(tileData);
             }
            else  if (m > 0.7)
             {
                 tileMap.SetTile(new Vector3Int(x, y, 0), swamp[0]);
+                TileData tileData = new TileData(new Vector3Int(x, y, 0), 4, E);
+                tileDatas.Add(tileData);
             }
         }
         else if (E < 0.8)
         {
             tileMap.SetTile(new Vector3Int(x, y, 0), desert[0]);
+            TileData tileData = new TileData(new Vector3Int(x, y, 0), 3, E);
+            tileDatas.Add(tileData);
 
         }
         else if (E < 1.5)
         {
             tileMap.SetTile(new Vector3Int(x, y, 0), iceMountains[0]);
+            TileData tileData = new TileData(new Vector3Int(x, y, 0), 5, E);
+            tileDatas.Add(tileData);
 
         }
 
