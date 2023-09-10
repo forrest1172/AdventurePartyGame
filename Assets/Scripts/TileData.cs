@@ -12,7 +12,7 @@ public class TileData
     {
         this.Position = pos;
         this.tileId = tileNum;
-        this.weight = weight - 0.2f;
+        this.weight = weight; //- 0.2f;
     }
 }
     

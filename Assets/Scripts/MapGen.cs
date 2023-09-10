@@ -45,6 +45,7 @@ public class MapGen : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        tileDatas.Clear();
         tileMap.ClearAllTiles();
         Generate();
 
@@ -52,7 +53,8 @@ public class MapGen : MonoBehaviour
 
     public void Generate()
     {
-        tileDatas.Clear();  
+        tileDatas.Clear();
+        tileMap.ClearAllTiles();
         moistureLvl = UnityEngine.Random.Range(0f, 0.75f);
 
         offsetX = UnityEngine.Random.Range(0, 9999);
@@ -75,10 +77,9 @@ public class MapGen : MonoBehaviour
                 double ny = y / height - 0.5f;
 
 
-                 m = moistureLvl 
-                    + CalculateMoisture(x, y) 
-                    + CalculateMoisture(1 * x,  1 * y) 
-                    + CalculateMoisture(2 * x, 2 * y);
+                m = CalculateMoisture(x, y);
+                   
+
 
                 double d = 2 * Math.Max(Math.Abs(nx), Math.Abs(ny));
 
@@ -88,6 +89,7 @@ public class MapGen : MonoBehaviour
                 //raise d to a power. the higher the power the larger the islands
                 d = Math.Pow(d, power);
                 e = (1 + e - d) / 2;
+                m = (1 + m - d) / 2;
                 double E = Math.Pow(e * fudge_factor, exponent);
 
 
@@ -123,13 +125,17 @@ public class MapGen : MonoBehaviour
         }
         else if (E < 0.5)
         {
-            tileMap.SetTile(new Vector3Int(x, y, 0), forest[0]);
-            TileData tileData = new TileData(new Vector3Int(x, y, 0), 2, E);
-            tileDatas.Add(tileData);    
+            
+           
+                tileMap.SetTile(new Vector3Int(x, y, 0), forest[0]);
+                TileData tileData = new TileData(new Vector3Int(x, y, 0), 2, E);
+                tileDatas.Add(tileData);
+
+
         }
         else if (E < 0.65)
         {
-            if(m < 0.3)
+            if(m < 0.2)
             {
                 tileMap.SetTile(new Vector3Int(x, y, 0), desert[0]);
                 TileData tileData = new TileData(new Vector3Int(x, y, 0), 3, E);
@@ -143,11 +149,11 @@ public class MapGen : MonoBehaviour
             }
             else if (m < 0.65)
             {
-                tileMap.SetTile(new Vector3Int(x, y, 0), forest[0]);
-                TileData tileData = new TileData(new Vector3Int(x, y, 0), 2, E);
+                tileMap.SetTile(new Vector3Int(x, y, 0), forest[1]);
+                TileData tileData = new TileData(new Vector3Int(x, y, 0), 6, E);
                 tileDatas.Add(tileData);
             }
-           else  if (m > 0.7)
+           else  if (m < 0.7)
             {
                 tileMap.SetTile(new Vector3Int(x, y, 0), swamp[0]);
                 TileData tileData = new TileData(new Vector3Int(x, y, 0), 4, E);
