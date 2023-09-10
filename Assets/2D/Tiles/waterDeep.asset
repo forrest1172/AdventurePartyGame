@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9d1514134bc4fbd41bb739b1b9a49231, type: 3}
   m_Name: waterDeep
   m_EditorClassIdentifier: 
-  m_DefaultSprite: {fileID: 21300000, guid: 0bce9e167d20c894696d1b7500412125, type: 3}
+  m_DefaultSprite: {fileID: 21300000, guid: 65f97617738bdcf40b2c6a3cc6fed0e1, type: 3}
   m_DefaultGameObject: {fileID: 0}
   m_DefaultColliderType: 1
   m_TilingRules: []

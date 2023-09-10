@@ -32,7 +32,7 @@ public class MapGen : MonoBehaviour
     public TileBase[] forest;
     public TileBase[] iceMountains;
     public TileBase[] Cities;
-    public TileBase[] encounterSpot;
+    
     public TileBase[] debugSprite;
 
     private double e;
@@ -52,6 +52,7 @@ public class MapGen : MonoBehaviour
 
     public void Generate()
     {
+        tileDatas.Clear();  
         moistureLvl = UnityEngine.Random.Range(0f, 0.75f);
 
         offsetX = UnityEngine.Random.Range(0, 9999);

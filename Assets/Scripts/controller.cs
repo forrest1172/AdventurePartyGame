@@ -35,12 +35,13 @@ public class controller : MonoBehaviour
             {
               
                myTile = tile;
-
+               return myTile;
             }
+           
            
             
         }
-       return myTile;
+        return null;
 
     }
     void Update()
@@ -48,15 +49,21 @@ public class controller : MonoBehaviour
         if (Input.GetMouseButtonDown(0))
         {
             Vector3 mousePos = cam.ScreenToWorldPoint(Input.mousePosition);
-            Vector3Int tilePos = map.WorldToCell(mousePos);
-            Debug.Log(tilePos);
+            Vector3Int clickedPos = map.WorldToCell(mousePos);
+            Vector3Int tilePos = new Vector3Int(clickedPos.x, clickedPos.y,0);
+            //Debug.Log(tilePos);
             TileData SelectedTile = GetTileData(tilePos);
-            Debug.Log(SelectedTile.Position + "" + SelectedTile.tileId + "" + SelectedTile.weight);
+            if (SelectedTile != null)
+            {
+                Debug.Log(SelectedTile.Position + " " + "Tile ID: " + SelectedTile.tileId + " " + "Tile weight: " + SelectedTile.weight.ToString("0.00"));
+            }
+            else Debug.Log("tile is null");
+            
             
             
 
         }
-            if (Input.GetMouseButton(0))
+            if (Input.GetMouseButton(2))
            {
             Diference = (cam.ScreenToWorldPoint(Input.mousePosition)) - cam.transform.position;
             if (Drag == false)
