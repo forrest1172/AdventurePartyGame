@@ -101,17 +101,27 @@ public class MapGen : MonoBehaviour
     }
     public void Biome(double E, int x, int y, double m)
     {
-        if (E < 0.2) tileMap.SetTile(new Vector3Int(x, y, 0), water[0]);
+        if (E < 0.2)
+        {
+            tileMap.SetTile(new Vector3Int(x, y, 0), water[0]);
+            TileData tileData = new TileData(new Vector3Int(x, y, 0), 0, E, water[0].name, true);
+            tileDatas.Add(tileData);
+        }
+            
+       
+
 
         else if(E < 0.3)
         {
             tileMap.SetTile(new Vector3Int(x, y, 0), water[1]);
+            TileData tileData = new TileData(new Vector3Int(x, y, 0), 0, E, water[1].name, true);
+            tileDatas.Add(tileData);
         }
 
         else if (E < 0.35)
         {
             tileMap.SetTile(new Vector3Int(x, y, 0), beach[0]);
-            TileData tileData = new TileData(new Vector3Int(x,y,0), 0, E, beach[0].name);
+            TileData tileData = new TileData(new Vector3Int(x,y,0), 0, E, beach[0].name, false);
             tileDatas.Add(tileData);
            
             
@@ -121,7 +131,7 @@ public class MapGen : MonoBehaviour
         {
             
             tileMap.SetTile(new Vector3Int(x, y, 0), grass[0]);
-            TileData tileData = new TileData(new Vector3Int(x, y, 0), 1, E, grass[0].name);
+            TileData tileData = new TileData(new Vector3Int(x, y, 0), 1, E, grass[0].name, false);
             tileDatas.Add(tileData);
         }
         else if (E < 0.5)
@@ -129,7 +139,7 @@ public class MapGen : MonoBehaviour
             
            
                 tileMap.SetTile(new Vector3Int(x, y, 0), forest[0]);
-                TileData tileData = new TileData(new Vector3Int(x, y, 0), 2, E, forest[0].name);
+                TileData tileData = new TileData(new Vector3Int(x, y, 0), 2, E, forest[0].name, false);
                 tileDatas.Add(tileData);
 
 
@@ -139,39 +149,39 @@ public class MapGen : MonoBehaviour
             if(m < 0.2)
             {
                 tileMap.SetTile(new Vector3Int(x, y, 0), desert[0]);
-                TileData tileData = new TileData(new Vector3Int(x, y, 0), 3, E, desert[0].name);
+                TileData tileData = new TileData(new Vector3Int(x, y, 0), 3, E, desert[0].name, false);
                 tileDatas.Add(tileData);
             }
             else if (m < 0.5)
             {
                 tileMap.SetTile(new Vector3Int(x, y, 0), grass[0]);
-                TileData tileData = new TileData(new Vector3Int(x, y, 0), 1, E, grass[0].name);
+                TileData tileData = new TileData(new Vector3Int(x, y, 0), 1, E, grass[0].name, false);
                 tileDatas.Add(tileData);
             }
             else if (m < 0.65)
             {
                 tileMap.SetTile(new Vector3Int(x, y, 0), forest[1]);
-                TileData tileData = new TileData(new Vector3Int(x, y, 0), 6, E, forest[1].name);
+                TileData tileData = new TileData(new Vector3Int(x, y, 0), 6, E, forest[1].name, false);
                 tileDatas.Add(tileData);
             }
            else  if (m < 0.7)
             {
                 tileMap.SetTile(new Vector3Int(x, y, 0), swamp[0]);
-                TileData tileData = new TileData(new Vector3Int(x, y, 0), 4, E, swamp[0].name);
+                TileData tileData = new TileData(new Vector3Int(x, y, 0), 4, E, swamp[0].name, false);
                 tileDatas.Add(tileData);
             }
         }
         else if (E < 0.8)
         {
             tileMap.SetTile(new Vector3Int(x, y, 0), desert[0]);
-            TileData tileData = new TileData(new Vector3Int(x, y, 0), 3, E, desert[0].name);
+            TileData tileData = new TileData(new Vector3Int(x, y, 0), 3, E, desert[0].name, false);
             tileDatas.Add(tileData);
 
         }
         else if (E < 1.5)
         {
             tileMap.SetTile(new Vector3Int(x, y, 0), iceMountains[0]);
-            TileData tileData = new TileData(new Vector3Int(x, y, 0), 5, E, iceMountains[0].name);
+            TileData tileData = new TileData(new Vector3Int(x, y, 0), 5, E, iceMountains[0].name, false);
             tileDatas.Add(tileData);
 
         }

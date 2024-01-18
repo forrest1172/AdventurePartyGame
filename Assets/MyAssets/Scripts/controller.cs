@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Drawing;
@@ -8,6 +9,7 @@ using UnityEngine.EventSystems;
 using UnityEngine.Tilemaps;
 using UnityEngine.WSA;
 using static UnityEditor.Progress;
+using static UnityEngine.RuleTile.TilingRuleOutput;
 using static UnityEngine.UI.Image;
 
 public class controller : MonoBehaviour
@@ -25,9 +27,14 @@ public class controller : MonoBehaviour
     private Vector3 Diference;
     private bool Drag = false;
 
+    private Vector3 playerData;
+    
+
     public GameObject selected = null;
+
     private void Start()
     {
+        ResetCamera = new Vector3(this.transform.position.x, this.transform.position.y, -10);
         Manager = GameObject.Find("GameManager");
         map = Manager.GetComponentInChildren<Tilemap>();
     }
@@ -52,8 +59,88 @@ public class controller : MonoBehaviour
     }
     void Update()
     {
+        if (selected != null)
+        {
+            
+            var playerCon = selected.GetComponent<player>();
+            Vector3Int playerPos = new Vector3Int(Mathf.RoundToInt(selected.transform.position.x - 0.5f), Mathf.RoundToInt(selected.transform.position.y - 0.5f));
+            
+            ResetCamera = new Vector3(playerPos.x, playerPos.y, -10);
 
+
+            if (playerCon.isSelected == true && playerCon.numOfLandMoves > 0)
+            {
+               
+
+                if (Input.GetKeyDown("d"))
+                {
+                    var tileToMove = GetTileData(new Vector3Int(playerPos.x + 1, playerPos.y, 0));
+                    if (tileToMove.isWater == false)
+                    {
+                        selected.transform.position = new Vector3(selected.transform.position.x + 1, selected.transform.position.y, 0);
+                        playerCon.numOfLandMoves -= 1;
+                        playerData = playerCon.GetPlayerData();
+                        Manager.GetComponent<UiManager>().DisplayPlayerData(playerData);
+                    }
+                    else
+                    {
+                        print("Cannot move there!");
+                    }
+                    
+                    
+                   
+                }
+                if (Input.GetKeyDown("a"))
+                {
+                    var tileToMove = GetTileData(new Vector3Int(playerPos.x - 1, playerPos.y, 0));
+                    if (tileToMove.isWater == false)
+                    {
+                        selected.transform.position = new Vector3(selected.transform.position.x - 1, selected.transform.position.y, 0);
+                        playerCon.numOfLandMoves -= 1;
+                        playerData = playerCon.GetPlayerData();
+                        Manager.GetComponent<UiManager>().DisplayPlayerData(playerData);
+                    }
+                    else
+                    {
+                        print("Cannot move there!");
+                    }
+                }
+  
+                if (Input.GetKeyDown("w"))
+                {
+                    var tileToMove = GetTileData(new Vector3Int(playerPos.x, playerPos.y + 1, 0));
+                    if (tileToMove.isWater == false)
+                    {
+                        selected.transform.position = new Vector3(selected.transform.position.x, selected.transform.position.y + 1, 0);
+                        playerCon.numOfLandMoves -= 1;
+                        playerData = playerCon.GetPlayerData();
+                        Manager.GetComponent<UiManager>().DisplayPlayerData(playerData);
+                    }
+                    else
+                    {
+                        print("Cannot move there!");
+                    }
+                }
+                if (Input.GetKeyDown("s"))
+                {
+                    var tileToMove = GetTileData(new Vector3Int(playerPos.x, playerPos.y - 1, 0));
+                    if (tileToMove.isWater == false)
+                    {
+                        selected.transform.position = new Vector3(selected.transform.position.x, selected.transform.position.y - 1, 0);
+                        playerCon.numOfLandMoves -= 1;
+                        playerData = playerCon.GetPlayerData();
+                        Manager.GetComponent<UiManager>().DisplayPlayerData(playerData);
+                    }
+                    else
+                    {
+                        print("Cannot move there!");
+                    }
+                }
+            }
+
+        }
         
+
         if (Input.GetMouseButtonDown(0))
         {
             
@@ -71,7 +158,7 @@ public class controller : MonoBehaviour
                     selected = hitChar;
                     var hitCharRend = hitChar.GetComponent<SpriteRenderer>();
                     hitCharRend.color = UnityEngine.Color.yellow;
-                    Vector3 playerData = hitChar.GetComponent<player>().GetPlayerData();
+                    playerData = hitChar.GetComponent<player>().GetPlayerData();
                     Manager.GetComponent<UiManager>().DisplayPlayerData(playerData);
                     Debug.Log("char hit");
                     
@@ -79,19 +166,19 @@ public class controller : MonoBehaviour
                 }
   
             }
-            
 
+            
             else if (hit.collider == null)
             {
                 
                 Manager.GetComponent<UiManager>().DisablePlayerData();
-
+                
                 if(selected != null)
                 {
+                    
                     selected.GetComponent<player>().UnSelect();
                     selected = null;
                 }
-                
                 
                 Vector3 mousePos = cam.ScreenToWorldPoint(Input.mousePosition);
                 Vector3Int clickedPos = map.WorldToCell(mousePos);
@@ -119,7 +206,7 @@ public class controller : MonoBehaviour
             }
 
         }
-            if (Input.GetMouseButton(2))
+        if (Input.GetMouseButton(2))
            {
             Diference = (cam.ScreenToWorldPoint(Input.mousePosition)) - cam.transform.position;
             if (Drag == false)
@@ -142,7 +229,7 @@ public class controller : MonoBehaviour
             cam.transform.position = ResetCamera;
             cam.orthographicSize = 6;
         }
-        ResetCamera = new Vector3(this.transform.position.x, this.transform.position.y, -10);
+       
 
         if (Input.GetAxis("Mouse ScrollWheel") > 0f)
         {

@@ -10,12 +10,15 @@ public class TileData
     public string tileName { get; set; }
     public double weight { get; set; }
 
-    public TileData(Vector3Int pos, int tileNum, double weight, string tileName)
+    public bool isWater {  get; set; }
+
+    public TileData(Vector3Int pos, int tileNum, double weight, string tileName, bool isWater)
     {
         this.Position = pos;
         this.tileId = tileNum;
         this.weight = weight - 0.2f;
         this.tileName = tileName;
+        this.isWater = isWater;
     }
 }
     
