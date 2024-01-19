@@ -28,7 +28,7 @@ public class player : MonoBehaviour
     public void UnSelect()
     {
         //remove this for move control
-        numOfLandMoves = 7;
+        numOfLandMoves += 7;
         //
         isSelected = false;
         GetComponent<SpriteRenderer>().color = Color.white;

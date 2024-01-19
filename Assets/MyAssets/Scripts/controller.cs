@@ -40,7 +40,7 @@ public class controller : MonoBehaviour
     }
     private TileData GetTileData(Vector3Int pos)
     {
-        //TO DO
+        //pulls the tile at position argument. Could be used to check if tile is water or not as well
         foreach (TileData tile in Manager.GetComponent<MapGen>().tileDatas)
         {
             
@@ -57,86 +57,91 @@ public class controller : MonoBehaviour
         return null;
 
     }
-    void Update()
+
+    void MovePlayer()
     {
-        if (selected != null)
+        var playerCon = selected.GetComponent<player>();
+        Vector3Int playerPos = new Vector3Int(Mathf.RoundToInt(selected.transform.position.x - 0.5f), Mathf.RoundToInt(selected.transform.position.y - 0.5f));
+
+        ResetCamera = new Vector3(playerPos.x + 0.4f, playerPos.y + 0.4f, -5);
+
+
+        if (playerCon.isSelected == true && playerCon.numOfLandMoves > 0)
         {
-            
-            var playerCon = selected.GetComponent<player>();
-            Vector3Int playerPos = new Vector3Int(Mathf.RoundToInt(selected.transform.position.x - 0.5f), Mathf.RoundToInt(selected.transform.position.y - 0.5f));
-            
-            ResetCamera = new Vector3(playerPos.x, playerPos.y, -10);
 
 
-            if (playerCon.isSelected == true && playerCon.numOfLandMoves > 0)
+            if (Input.GetKeyDown("d"))
             {
-               
+                var tileToMove = GetTileData(new Vector3Int(playerPos.x + 1, playerPos.y, 0));
+                if (tileToMove.isWater == false)
+                {
+                    selected.transform.position = new Vector3(selected.transform.position.x + 1, selected.transform.position.y, 0);
+                    playerCon.numOfLandMoves -= 1;
+                    playerData = playerCon.GetPlayerData();
+                    Manager.GetComponent<UiManager>().DisplayPlayerData(playerData);
+                }
+                else
+                {
+                    print("Cannot move there!");
+                }
 
-                if (Input.GetKeyDown("d"))
+
+
+            }
+            if (Input.GetKeyDown("a"))
+            {
+                var tileToMove = GetTileData(new Vector3Int(playerPos.x - 1, playerPos.y, 0));
+                if (tileToMove.isWater == false)
                 {
-                    var tileToMove = GetTileData(new Vector3Int(playerPos.x + 1, playerPos.y, 0));
-                    if (tileToMove.isWater == false)
-                    {
-                        selected.transform.position = new Vector3(selected.transform.position.x + 1, selected.transform.position.y, 0);
-                        playerCon.numOfLandMoves -= 1;
-                        playerData = playerCon.GetPlayerData();
-                        Manager.GetComponent<UiManager>().DisplayPlayerData(playerData);
-                    }
-                    else
-                    {
-                        print("Cannot move there!");
-                    }
-                    
-                    
-                   
+                    selected.transform.position = new Vector3(selected.transform.position.x - 1, selected.transform.position.y, 0);
+                    playerCon.numOfLandMoves -= 1;
+                    playerData = playerCon.GetPlayerData();
+                    Manager.GetComponent<UiManager>().DisplayPlayerData(playerData);
                 }
-                if (Input.GetKeyDown("a"))
+                else
                 {
-                    var tileToMove = GetTileData(new Vector3Int(playerPos.x - 1, playerPos.y, 0));
-                    if (tileToMove.isWater == false)
-                    {
-                        selected.transform.position = new Vector3(selected.transform.position.x - 1, selected.transform.position.y, 0);
-                        playerCon.numOfLandMoves -= 1;
-                        playerData = playerCon.GetPlayerData();
-                        Manager.GetComponent<UiManager>().DisplayPlayerData(playerData);
-                    }
-                    else
-                    {
-                        print("Cannot move there!");
-                    }
-                }
-  
-                if (Input.GetKeyDown("w"))
-                {
-                    var tileToMove = GetTileData(new Vector3Int(playerPos.x, playerPos.y + 1, 0));
-                    if (tileToMove.isWater == false)
-                    {
-                        selected.transform.position = new Vector3(selected.transform.position.x, selected.transform.position.y + 1, 0);
-                        playerCon.numOfLandMoves -= 1;
-                        playerData = playerCon.GetPlayerData();
-                        Manager.GetComponent<UiManager>().DisplayPlayerData(playerData);
-                    }
-                    else
-                    {
-                        print("Cannot move there!");
-                    }
-                }
-                if (Input.GetKeyDown("s"))
-                {
-                    var tileToMove = GetTileData(new Vector3Int(playerPos.x, playerPos.y - 1, 0));
-                    if (tileToMove.isWater == false)
-                    {
-                        selected.transform.position = new Vector3(selected.transform.position.x, selected.transform.position.y - 1, 0);
-                        playerCon.numOfLandMoves -= 1;
-                        playerData = playerCon.GetPlayerData();
-                        Manager.GetComponent<UiManager>().DisplayPlayerData(playerData);
-                    }
-                    else
-                    {
-                        print("Cannot move there!");
-                    }
+                    print("Cannot move there!");
                 }
             }
+
+            if (Input.GetKeyDown("w"))
+            {
+                var tileToMove = GetTileData(new Vector3Int(playerPos.x, playerPos.y + 1, 0));
+                if (tileToMove.isWater == false)
+                {
+                    selected.transform.position = new Vector3(selected.transform.position.x, selected.transform.position.y + 1, 0);
+                    playerCon.numOfLandMoves -= 1;
+                    playerData = playerCon.GetPlayerData();
+                    Manager.GetComponent<UiManager>().DisplayPlayerData(playerData);
+                }
+                else
+                {
+                    print("Cannot move there!");
+                }
+            }
+            if (Input.GetKeyDown("s"))
+            {
+                var tileToMove = GetTileData(new Vector3Int(playerPos.x, playerPos.y - 1, 0));
+                if (tileToMove.isWater == false)
+                {
+                    selected.transform.position = new Vector3(selected.transform.position.x, selected.transform.position.y - 1, 0);
+                    playerCon.numOfLandMoves -= 1;
+                    playerData = playerCon.GetPlayerData();
+                    Manager.GetComponent<UiManager>().DisplayPlayerData(playerData);
+                }
+                else
+                {
+                    print("Cannot move there!");
+                }
+            }
+        }
+    }
+    void Update()
+    {
+        //check if selected has a gameObject
+        if (selected != null && selected.GetComponent<player>() != null)
+        {
+            MovePlayer();
 
         }
         
@@ -233,11 +238,11 @@ public class controller : MonoBehaviour
 
         if (Input.GetAxis("Mouse ScrollWheel") > 0f)
         {
-            cam.orthographicSize--;
+            cam.orthographicSize -= 5;
         }
         if (Input.GetAxis("Mouse ScrollWheel") < 0f)
         {
-            cam.orthographicSize++;
+            cam.orthographicSize += 5;
         }
     }
     private bool IsmouseOverUI()
