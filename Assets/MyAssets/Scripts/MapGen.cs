@@ -3,11 +3,12 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 using System;
-
+using System.Security.Cryptography;
+using Unity.Mathematics;
 
 public class MapGen : MonoBehaviour
 {
-    
+
 
     public double width = 10;
     public double height = 10;
@@ -21,6 +22,9 @@ public class MapGen : MonoBehaviour
     [SerializeField]
     private double power = 0.8;
 
+    [SerializeField]
+    private int numCity_Spawn = 25;
+
 
     public Tilemap tileMap;
 
@@ -32,14 +36,13 @@ public class MapGen : MonoBehaviour
     public TileBase[] forest;
     public TileBase[] iceMountains;
     public TileBase[] Cities;
-    
+
     public TileBase[] debugSprite;
 
     private double e;
 
     public List<TileData> tileDatas = new List<TileData>();
-    
-    public float moistureLvl;
+
     private double m;
 
     // Start is called before the first frame update
@@ -55,11 +58,11 @@ public class MapGen : MonoBehaviour
     {
         tileDatas.Clear();
         tileMap.ClearAllTiles();
-        moistureLvl = UnityEngine.Random.Range(0f, 0.75f);
+
 
         offsetX = UnityEngine.Random.Range(0, 9999);
         offsetY = UnityEngine.Random.Range(0, 9999);
-       
+
 
         for (int x = 0; x < width; x++)
         {
@@ -67,19 +70,11 @@ public class MapGen : MonoBehaviour
             for (int y = 0; y < height; y++)
             {
 
-                if (x == width && y == height)
-                {
-                    Debug.Log("map done...");
-                    return;
-                }
-
                 double nx = x / width - 0.5f;
                 double ny = y / height - 0.5f;
 
 
                 m = CalculateMoisture(x, y);
-                   
-
 
                 double d = 2 * Math.Max(Math.Abs(nx), Math.Abs(ny));
 
@@ -92,9 +87,14 @@ public class MapGen : MonoBehaviour
                 m = (1 + m - d) / 2;
                 double E = Math.Pow(e * fudge_factor, exponent);
 
-
-
                 Biome(E, x, y, m);
+
+                if (x == width - 1 && y == height - 1)
+                {
+                    Debug.Log("map done...");
+                    AddCities();
+
+                }
 
             }
         }
@@ -107,64 +107,62 @@ public class MapGen : MonoBehaviour
             TileData tileData = new TileData(new Vector3Int(x, y, 0), 0, E, water[0].name, true);
             tileDatas.Add(tileData);
         }
-            
-       
 
-
-        else if(E < 0.3)
+        else if (E < 0.25)
         {
             tileMap.SetTile(new Vector3Int(x, y, 0), water[1]);
             TileData tileData = new TileData(new Vector3Int(x, y, 0), 0, E, water[1].name, true);
             tileDatas.Add(tileData);
         }
 
-        else if (E < 0.35)
+        else if (E < 0.3)
         {
-            tileMap.SetTile(new Vector3Int(x, y, 0), beach[0]);
-            TileData tileData = new TileData(new Vector3Int(x,y,0), 0, E, beach[0].name, false);
-            tileDatas.Add(tileData);
            
-            
+            tileMap.SetTile(new Vector3Int(x, y, 0), beach[0]);
+            TileData tileData = new TileData(new Vector3Int(x, y, 0), 0, E, beach[0].name, false);
+            tileDatas.Add(tileData);
+
+
         }
 
         else if (E < 0.4)
         {
-            
+
             tileMap.SetTile(new Vector3Int(x, y, 0), grass[0]);
             TileData tileData = new TileData(new Vector3Int(x, y, 0), 1, E, grass[0].name, false);
             tileDatas.Add(tileData);
         }
         else if (E < 0.5)
         {
-            
-           
-                tileMap.SetTile(new Vector3Int(x, y, 0), forest[0]);
-                TileData tileData = new TileData(new Vector3Int(x, y, 0), 2, E, forest[0].name, false);
-                tileDatas.Add(tileData);
+
+
+            tileMap.SetTile(new Vector3Int(x, y, 0), forest[0]);
+            TileData tileData = new TileData(new Vector3Int(x, y, 0), 2, E, forest[0].name, false);
+            tileDatas.Add(tileData);
 
 
         }
-        else if (E < 0.65)
+        else if (E < 0.6)
         {
-            if(m < 0.2)
+            if (m < 0.2)
             {
                 tileMap.SetTile(new Vector3Int(x, y, 0), desert[0]);
                 TileData tileData = new TileData(new Vector3Int(x, y, 0), 3, E, desert[0].name, false);
                 tileDatas.Add(tileData);
             }
-            else if (m < 0.5)
+            else if (m < 0.4)
             {
                 tileMap.SetTile(new Vector3Int(x, y, 0), grass[0]);
                 TileData tileData = new TileData(new Vector3Int(x, y, 0), 1, E, grass[0].name, false);
                 tileDatas.Add(tileData);
             }
-            else if (m < 0.65)
+            else if (m < 0.5)
             {
                 tileMap.SetTile(new Vector3Int(x, y, 0), forest[1]);
                 TileData tileData = new TileData(new Vector3Int(x, y, 0), 6, E, forest[1].name, false);
                 tileDatas.Add(tileData);
             }
-           else  if (m < 0.7)
+            else
             {
                 tileMap.SetTile(new Vector3Int(x, y, 0), swamp[0]);
                 TileData tileData = new TileData(new Vector3Int(x, y, 0), 4, E, swamp[0].name, false);
@@ -173,9 +171,19 @@ public class MapGen : MonoBehaviour
         }
         else if (E < 0.8)
         {
-            tileMap.SetTile(new Vector3Int(x, y, 0), desert[0]);
-            TileData tileData = new TileData(new Vector3Int(x, y, 0), 3, E, desert[0].name, false);
-            tileDatas.Add(tileData);
+            if (m < 0.5)
+            {
+                tileMap.SetTile(new Vector3Int(x, y, 0), desert[0]);
+                TileData tileData = new TileData(new Vector3Int(x, y, 0), 3, E, desert[0].name, false);
+                tileDatas.Add(tileData);
+            }
+            else
+            {
+                tileMap.SetTile(new Vector3Int(x, y, 0), grass[0]);
+                TileData tileData = new TileData(new Vector3Int(x, y, 0), 2, E, grass[0].name, false);
+                tileDatas.Add(tileData);
+
+            }
 
         }
         else if (E < 1.5)
@@ -202,5 +210,30 @@ public class MapGen : MonoBehaviour
         float xCoord = (float)(x / width * scale + offsetX);
         float yCoord = (float)(y / height * scale + offsetY);
         return Mathf.PerlinNoise(xCoord, yCoord);
+    }
+
+    void AddCities()
+    {
+        List<Vector3Int> possCityList = new List<Vector3Int>();
+
+        foreach(TileData tile in tileDatas)
+        {
+            if(tile.isWater == false && tile.tileName != "swamp")
+            {
+                Vector3Int possCityLocal = tile.Position;
+                possCityList.Add(possCityLocal);
+
+            }
+        }
+
+        int leng = possCityList.Count;
+        for (int i = 0; i < numCity_Spawn; i++)
+        {
+            int randNum = UnityEngine.Random.Range(0, leng);
+            tileMap.SetTile(possCityList[randNum], Cities[0]);
+            //TODO: add citydata 
+
+        }
+        
     }
 }

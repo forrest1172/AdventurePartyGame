@@ -423,7 +423,7 @@ Light:
     m_Strength: 1
     m_Bias: 0.05
     m_NormalBias: 0.4
-    m_NearPlane: 0.2
+    m_NearPlane: 1.1
     m_CullingMatrixOverride:
       e00: 1
       e01: 0
@@ -470,7 +470,7 @@ Transform:
   m_GameObject: {fileID: 410087039}
   serializedVersion: 2
   m_LocalRotation: {x: -0.46430382, y: -0.226957, z: -0.12440982, w: 0.8470152}
-  m_LocalPosition: {x: 0, y: 3, z: 0}
+  m_LocalPosition: {x: 768, y: 3, z: 60.9}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -498,7 +498,7 @@ MonoBehaviour:
   m_ShadowRenderingLayers: 1
   m_LightCookieSize: {x: 1, y: 1}
   m_LightCookieOffset: {x: 0, y: 0}
-  m_SoftShadowQuality: 1
+  m_SoftShadowQuality: 0
 --- !u!1 &501001581
 GameObject:
   m_ObjectHideFlags: 0
@@ -769,7 +769,7 @@ TilemapRenderer:
   m_ChunkCullingBounds: {x: 0, y: 0, z: 0}
   m_MaxChunkCount: 16
   m_MaxFrameAge: 16
-  m_SortOrder: 0
+  m_SortOrder: 2
   m_Mode: 0
   m_DetectChunkCullingBounds: 0
   m_MaskInteraction: 0
@@ -1142,14 +1142,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7f4afab49875f50428d9a26a0c5e1348, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  width: 200
-  height: 100
+  width: 250
+  height: 150
   scale: 5
   exponent: 2.96
   fudge_factor: 1.2
   offsetX: 3411
   offsetY: 1264
   power: 0.3
+  numCity_Spawn: 25
   tileMap: {fileID: 723821988}
   water:
   - {fileID: 11400000, guid: 4333440e1dbb3ec4c91ba7a839e3f63d, type: 2}
@@ -1167,10 +1168,10 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 32bacfb3c20cad34b9587e1e30a154ed, type: 2}
   iceMountains:
   - {fileID: 11400000, guid: 16f38a1c08f60c940a270d857fcc784b, type: 2}
-  Cities: []
+  Cities:
+  - {fileID: 11400000, guid: 9450551fe87185c45967bcfb583d14b5, type: 2}
   debugSprite:
   - {fileID: 11400000, guid: 9b8560d06613dc1459f75917c95d32fc, type: 2}
-  moistureLvl: 0
 --- !u!156049354 &1059098798
 Grid:
   m_ObjectHideFlags: 0
@@ -1627,8 +1628,8 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: 19f9cd6e0504b1d4a92bbae40578110e, type: 3}
+  m_SortingOrder: 10
+  m_Sprite: {fileID: 21300000, guid: acc230ffbaef16943a00ebbb59904671, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0

@@ -138,7 +138,7 @@ public class controller : MonoBehaviour
     }
     void Update()
     {
-        //check if selected has a gameObject
+        //check if selected has a gameObject and has player 
         if (selected != null && selected.GetComponent<player>() != null)
         {
             MovePlayer();
