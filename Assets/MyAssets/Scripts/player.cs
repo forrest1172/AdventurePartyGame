@@ -37,6 +37,7 @@ public class player : MonoBehaviour
     {
         
         isSelected = true;
+        
         return new Vector3(speed, currentHealth, numOfLandMoves);
     }
 
