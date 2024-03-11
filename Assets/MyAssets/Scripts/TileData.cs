@@ -13,6 +13,13 @@ public class TileData
 
     public bool isCity { get; set; }
 
+    public int g {  get; set; }
+    public int h { get; set; }
+    public int f { get; set; }
+
+    public TileData parent;
+
+
     public TileData(Vector3Int pos, double weight, string tileName ,bool isWater = false, bool isCity = false)
     {
         this.Position = pos;
@@ -20,8 +27,11 @@ public class TileData
         this.weight = weight - 0.2f;
         this.isWater = isWater;
         this.isCity = isCity;
+        this.g = int.MaxValue;
+        this.h = 0;
+        this.f = 0;
+        parent = null;
 
-       
     }
 }
     

@@ -55,10 +55,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cb96348bd96f90548b090123bb839ee7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  speed: 0.1
   Manager: {fileID: 0}
   map: {fileID: 0}
   cam: {fileID: 7740368563621404110}
-  HighlightTile: {fileID: 0}
+  HighlightTile: {fileID: 11400000, guid: 225ea9051119fa941b60b893d7bf9a86, type: 2}
   highlightMap: {fileID: 0}
   neighbors: []
   tilePos: {x: 0, y: 0, z: 0}
@@ -131,7 +132,7 @@ MonoBehaviour:
   m_RequiresOpaqueTextureOption: 2
   m_CameraType: 0
   m_Cameras: []
-  m_RendererIndex: -1
+  m_RendererIndex: 0
   m_VolumeLayerMask:
     serializedVersion: 2
     m_Bits: 1

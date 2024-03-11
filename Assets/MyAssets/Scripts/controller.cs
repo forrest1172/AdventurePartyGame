@@ -1,3 +1,4 @@
+using JetBrains.Annotations;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -5,6 +6,8 @@ using System.Drawing;
 using System.Linq;
 using Unity.VisualScripting;
 using UnityEditor;
+using UnityEditor.Rendering;
+using UnityEditor.U2D.Aseprite;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.Tilemaps;
@@ -15,7 +18,7 @@ using static UnityEngine.UI.Image;
 
 public class controller : MonoBehaviour
 {
-    
+    public float speed = 0.1f;
     private TileData myTile;
     [SerializeField]
     private GameObject Manager;
@@ -31,15 +34,16 @@ public class controller : MonoBehaviour
     private Vector3 playerData;
     [SerializeField] private Vector3Int[] neighbors;
     public Vector3Int tilePos;
+    private TileData currentTile = null;
 
     public GameObject selected = null;
-
-    private void Start()
+    public Stack<TileData> path;
+    private void Awake()
     {
         ResetCamera = new Vector3(this.transform.position.x, this.transform.position.y, -10);
         Manager = GameObject.Find("GameManager");
-        //map = Manager.GetComponent<HexMapGen>().worldMap;
-        //highlightMap = Manager.GetComponent<HexMapGen>().overlay;
+        map = Manager.GetComponent<HexMapGen>().worldMap;
+        highlightMap = Manager.GetComponent<HexMapGen>().overlay;
 
     }
 
@@ -98,24 +102,10 @@ public class controller : MonoBehaviour
 
     }
 
-    void MovePlayer()
-    {
-        var playerCon = selected.GetComponent<player>();
-        Vector3Int playerPos = new Vector3Int(Mathf.RoundToInt(selected.transform.position.x - 0.5f), Mathf.RoundToInt(selected.transform.position.y - 0.5f));
-
-        ResetCamera = new Vector3(playerPos.x + 0.4f, playerPos.y + 0.4f, -5);
-    }
+   
     void Update()
     {
-        //check if selected has a gameObject and has player 
-        if (selected != null && selected.GetComponent<player>() != null)
-        {
-            MovePlayer();
-
-        }
-        
-
-        if (Input.GetMouseButtonDown(0))
+        if (Input.GetMouseButtonUp(0))
         {
             
             Ray point = cam.ScreenPointToRay(Input.mousePosition);
@@ -123,8 +113,6 @@ public class controller : MonoBehaviour
             
             if (hit.collider != null)
             {
-               
-
                 if (hit.collider.gameObject.CompareTag("character") == true)
                 {
                     
@@ -134,12 +122,7 @@ public class controller : MonoBehaviour
                     hitCharRend.color = UnityEngine.Color.yellow;
                     playerData = hitChar.GetComponent<player>().GetPlayerData();
                     Manager.GetComponent<UiManager>().DisplayPlayerData(playerData);
-                    Vector3 playerPos = hitChar.transform.position;
-                    Vector3Int playerHexPos = map.WorldToCell(playerPos + map.tileAnchor);
-                    GetNeighbors(playerHexPos);
-                    Debug.Log("char hit" + playerHexPos.ToString());
-                    
-
+                    //GetNeighbors(playerHexPos);
                 }
   
             }
@@ -149,9 +132,6 @@ public class controller : MonoBehaviour
             {
                 
                 Manager.GetComponent<UiManager>().DisablePlayerData();
-                
-               
-                
                 Vector3 mousePos = cam.ScreenToWorldPoint(Input.mousePosition);
                 Vector3Int clickedPos = map.WorldToCell(mousePos);
                 tilePos = new Vector3Int(clickedPos.x, clickedPos.y, 0);
@@ -159,14 +139,24 @@ public class controller : MonoBehaviour
                 TileData SelectedTile = GetTileData(tilePos);
                 if(SelectedTile == null)
                 {
+                    selected.GetComponent<player>().UnSelect();
+                    selected = null;
                     Debug.Log("tile is null");
                     return;
                 }
-                else if (neighbors.Contains(tilePos))
+                if (selected != null)
                 {
-                    selected.transform.position = map.CellToWorld(tilePos) - map.tileAnchor;
-                    highlightMap.ClearAllTiles();
-
+                    Vector3 playerPos = selected.transform.position;
+                    Vector3Int playerHexPos = map.WorldToCell(playerPos + map.tileAnchor);
+                    TileData playerTile = GetTileData(playerHexPos);
+                    path = new Stack<TileData>(Manager.GetComponent<HexMapGen>().GetPath(playerTile, SelectedTile));
+                    if (path == null)
+                    {
+                        return;
+                    }
+                    Debug.Log(path.Count + " tiles in path");
+                    GetNextTile();
+                    selected.GetComponent<player>().UnSelect();
                 }
 
                 else if (SelectedTile.isCity == false)
@@ -183,12 +173,6 @@ public class controller : MonoBehaviour
                     Manager.GetComponent<UiManager>().DisplayWorldData(world_data);
                     Debug.Log("this is a city");
                 }
-                else if (selected != null)
-                {
-
-                    selected.GetComponent<player>().UnSelect();
-                    selected = null;
-                }
                 else
                 {
                     Debug.Log("tile is null");
@@ -202,6 +186,51 @@ public class controller : MonoBehaviour
             }
 
         }
+        void MoveOnPath()
+        {
+            if (currentTile == null) return;
+            selected.transform.position = map.CellToWorld(currentTile.Position) - map.tileAnchor;
+            ResetCamera = new Vector3(selected.transform.position.x, selected.transform.position.y, -10);
+            if (selected.transform.position == map.CellToWorld(currentTile.Position) - map.tileAnchor)
+            {
+                StartCoroutine(DoDelay());
+                
+            }
+            
+        }
+        IEnumerator DoDelay()
+        {
+            yield return new WaitForSeconds(speed);
+            GetNextTile();
+        }
+
+        void GetNextTile()
+        {
+            if (path.Count > 0)
+            {
+                foreach(TileData tile in path)
+                {
+                    highlightMap.SetTile(tile.Position, HighlightTile);
+                }
+                currentTile = path.Pop();
+                MoveOnPath();
+            }
+            else 
+            { 
+                foreach (TileData tile in path)
+                {
+                    tile.parent = null;
+                }
+                //maybe roads and rivers?
+                highlightMap.ClearAllTiles();
+                currentTile = null;
+                path.Clear();
+                Manager.GetComponent<HexMapGen>().pathfinding.openList.Clear();
+                Manager.GetComponent<HexMapGen>().pathfinding.closedList.Clear();
+                selected = null;
+            }
+        }
+
         if (Input.GetMouseButton(2))
            {
             Diference = (cam.ScreenToWorldPoint(Input.mousePosition)) - cam.transform.position;
@@ -223,22 +252,23 @@ public class controller : MonoBehaviour
         if (Input.GetMouseButton(1))
         {
             cam.transform.position = ResetCamera;
-            cam.orthographicSize = 6;
+            cam.orthographicSize = 5;
         }
        
 
         if (Input.GetAxis("Mouse ScrollWheel") > 0f)
         {
-            cam.orthographicSize -= 5;
+            if(cam.orthographicSize <= 1)
+            {
+                cam.orthographicSize = 1;
+            }
+            else cam.orthographicSize -= 1;
+
         }
         if (Input.GetAxis("Mouse ScrollWheel") < 0f)
         {
             cam.orthographicSize += 5;
         }
-    }
-    void CheckNextClick(Vector3Int clickedTile, Vector3Int tileToGo)
-    {
-        
     }
     private bool IsmouseOverUI()
     {

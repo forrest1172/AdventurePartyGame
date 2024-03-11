@@ -18,23 +18,25 @@ public class HexMapGen : MonoBehaviour
 
     public float offsetX = 100;
     public float offsetY = 100;
-
+    public TileBase fog;
     public Tilemap worldMap;
     public Tilemap overlay;
-    [SerializeField] private int radius = 5; // Map radius in hexes
-
+    private CharacterSpawn spawner;
+    public AStar pathfinding;
     [SerializeField] private TileBase[] tile;
     public List<TileData> tileDatas = new List<TileData>();
     private void Start()
     {
-        tileDatas.Clear();
         
+        tileDatas.Clear();
+        spawner = GetComponent<CharacterSpawn>();
         worldMap = GameObject.Find("TileMap").GetComponent<Tilemap>();
         overlay = GameObject.Find("OverLayMap").GetComponent<Tilemap>();
         GenerateMap();
     }
     public void GenerateMap()
     {
+        pathfinding = new AStar();
         tileDatas.Clear();
         worldMap.ClearAllTiles();
         offsetX = UnityEngine.Random.Range(0, 9999);
@@ -44,9 +46,8 @@ public class HexMapGen : MonoBehaviour
         {
             for (int y = 0; y <= height; y++)
             {
-                // Adjust for hexagonal grid offset
-                //int x_offset = y % 2 == 0 ? x : x - 1;
-
+               
+                
                 Vector3Int hexPos = new Vector3Int(x, y, 0);
 
                 //make one big island
@@ -61,7 +62,16 @@ public class HexMapGen : MonoBehaviour
                 d = Math.Pow(d, power);
                 e = (1 + e - d) / 2;
                 double E = Math.Pow(e * fudge_factor, exponent);
+
                 SetTile(hexPos,E);
+
+                if (x == width - 1 && y == height - 1)
+                {
+                    Debug.Log("map done...");
+                    spawner.SpawnChars();
+                    pathfinding.SendTileData(tileDatas);
+
+                }
             }
         }
     }
@@ -111,11 +121,29 @@ public class HexMapGen : MonoBehaviour
     float CalculateHeight(double nx, double ny)
     {
 
-        float xCoord = (float)(nx / radius * scale + offsetX);
-        float yCoord = (float)(ny / radius * scale + offsetY);
+        float xCoord = (float)(nx / width * scale + offsetX);
+        float yCoord = (float)(ny / height * scale + offsetY);
         return Mathf.PerlinNoise(xCoord, yCoord);
     }
 
-    
+    public List<TileData> GetPath(TileData start, TileData end)
+    {
+        
+        List<TileData> path = (pathfinding.FindPath(start, end));
+        if (path == null)
+        {
+            Debug.Log("path is not found!");
+            //pathfinding = null;
+            return null;
+        }
+        else 
+        {
+            Debug.Log("path found!");
+            //pathfinding = null;
+            return path;
+            
+        }
+        
+    }
 
 }
